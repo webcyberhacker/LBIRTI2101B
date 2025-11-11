@@ -1,0 +1,17 @@
+[project]
+name = "wazo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "python-dotenv",
+    "torch",
+    "torchaudio",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "tqdm",
+   
+]

@@ -1,0 +1,5 @@
+.venv/
+.env
+recordings/
+.DS_Store
+**/__pycache__/**
