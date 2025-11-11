@@ -1,4 +1,4 @@
-# Wazo
+# Wazo 
 
 This project develops a CNN algorithm to identify birds from records.
 among the 10 most present species in Belgium (source: Natagora):
