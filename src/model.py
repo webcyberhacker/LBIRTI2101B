@@ -24,7 +24,7 @@ class BirdCNN(nn.Module):
         self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.bn2 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout1 = nn.Dropout2d(0.25)
+        self.dropout1 = nn.Dropout2d(0.4)
         
         # Second convolutional block
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
@@ -32,7 +32,7 @@ class BirdCNN(nn.Module):
         self.conv4 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
         self.bn4 = nn.BatchNorm2d(64)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout2 = nn.Dropout2d(0.25)
+        self.dropout2 = nn.Dropout2d(0.4)
         
         # Third convolutional block
         self.conv5 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
@@ -40,7 +40,7 @@ class BirdCNN(nn.Module):
         self.conv6 = nn.Conv2d(128, 128, kernel_size=3, padding=1)
         self.bn6 = nn.BatchNorm2d(128)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout3 = nn.Dropout2d(0.25)
+        self.dropout3 = nn.Dropout2d(0.4)
         
         # Fourth convolutional block
         self.conv7 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
@@ -48,7 +48,7 @@ class BirdCNN(nn.Module):
         self.conv8 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
         self.bn8 = nn.BatchNorm2d(256)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout4 = nn.Dropout2d(0.25)
+        self.dropout4 = nn.Dropout2d(0.4)
         
         # Calculate the size after convolutions
         # Input: (1, 128, 130)

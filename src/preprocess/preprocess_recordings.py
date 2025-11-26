@@ -1,50 +1,50 @@
 """Script to preprocess all recordings for CNN training."""
 
-import argparse
-from pathlib import Path
-from src.preprocessing import AudioPreprocessor
-from src.xenocanto.config import RECORDINGS_DIR #
+import argparse # package permet de modifier les arguments depuis un terminal
+from pathlib import Path # pr mieux manipuler les chemins fichiers
+from preprocessing import AudioPreprocessor # importe la fonction Audioprocessor depuis le script preprocessing.py
+from src.xenocanto.config import RECORDINGS_DIR # défini un chemin par défaut
 
 
 def main():
-    """Preprocess all recordings in the recordings directory."""
+    """Preprocess all recordings in the recordings directory.""" # parser = analyseur
     parser = argparse.ArgumentParser(description="Preprocess audio recordings for CNN training")
     parser.add_argument(
         "--recordings-dir",
         type=str,
         default=RECORDINGS_DIR,
         help="Directory containing raw recordings",
-    )
+    )#localisation des sons bruts
     parser.add_argument(
         "--output-dir",
         type=str,
         default="data/preprocessed",
         help="Directory to save preprocessed data",
-    )
+    )# localisation des sons traités
     parser.add_argument(
         "--sample-rate",
         type=int,
         default=22050,
         help="Target sample rate",
-    )
+    )# qualité du son (fréquence d'échantillonage économise de la place)
     parser.add_argument(
         "--n-mels",
         type=int,
         default=128,
         help="Number of mel filter banks",
-    )
+    )# conversion en spectrogramme + hauteur de l'image (+ haut = + précis)
     parser.add_argument(
         "--duration",
         type=float,
         default=3.0,
         help="Target duration in seconds",
-    )
+    )# durée de chaque enregistrment = longueur de l'image
     
-    args = parser.parse_args()
+    args = parser.parse_args() #récupère les réglages choisis
     
     recordings_dir = Path(args.recordings_dir)
     output_dir = Path(args.output_dir)
-    
+    # vérifie l'existence du dossier source
     if not recordings_dir.exists():
         print(f"Error: Recordings directory {recordings_dir} does not exist")
         return
@@ -56,7 +56,7 @@ def main():
         duration=args.duration,
     )
     
-    # Process each bird species directory
+    # Process each bird species directory, cherche les sous-dossier pour chaque espèce
     bird_dirs = [d for d in recordings_dir.iterdir() if d.is_dir()]
     
     if not bird_dirs:
