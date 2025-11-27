@@ -26,13 +26,13 @@ def main():
     for species in target_species:
         # On construit la requête dynamiquement pour chaque espèce
         # Je garde 'cnt:belgium' pour rester fidèle à ton script, mais tu peux l'enlever pour avoir le monde entier
-        query = f'sp:"{species}" cnt:belgium'
+        query = f'sp:"{species}" q:A type:song'
         print(f"\n--- Traitement de : {species} ---")
         print(f"Searching: {query}")
         
         # J'ai mis 20 fichiers par espèce (per_page=20) pour que tu aies un peu de matière pour l'IA
         # Tu peux remettre 5 si c'est juste pour tester
-        data = api.search(query, per_page=20)
+        data = api.search(query, per_page=50)
         
         if not data or not data.get('recordings'):
             print(f"No recordings found for {species}.")
@@ -53,7 +53,7 @@ def main():
         # Petite pause de 1 seconde pour être poli avec le serveur
         time.sleep(1)
 
-    print("\n=== Tout est fini ! ===")
+    print("\n=== The download is complete ===")
 
 if __name__ == "__main__":
     main()

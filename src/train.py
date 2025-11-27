@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from pathlib import Path
 from tqdm import tqdm
 import json
+import matplotlib.pyplot as plt
 from datetime import datetime
 
 from src.model import create_model
@@ -75,6 +76,38 @@ def validate(model, dataloader, criterion, device):
     
     return epoch_loss, epoch_acc
 
+def plot_training_results(history, save_dir):
+    """Génère et sauvegarde les courbes d'apprentissage."""
+    epochs = range(1, len(history['train_acc']) + 1)
+
+    plt.figure(figsize=(15, 6))
+
+    # Graphique 1 : Accuracy (Précision)
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, history['train_acc'], 'b-', label='Train Accuracy')
+    plt.plot(epochs, history['val_acc'], 'r-', label='Validation Accuracy')
+    plt.title('Training vs Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy (%)')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    # Graphique 2 : Loss (Perte/Erreur)
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, history['train_loss'], 'b-', label='Train Loss')
+    plt.plot(epochs, history['val_loss'], 'r-', label='Validation Loss')
+    plt.title('Training vs Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    # Sauvegarde
+    plt.tight_layout()
+    plot_path = save_dir / "training_plots.png"
+    plt.savefig(plot_path)
+    plt.close()
+    print(f"✓ Plots saved to: {plot_path}")
 
 def main():
     """Main training function."""
@@ -262,7 +295,13 @@ def main():
     history_path = output_dir / "training_history.json"
     with open(history_path, 'w') as f:
         json.dump(history, f, indent=2)
-    
+
+    print("\nGenerating training plots...")
+    plot_training_results(history, output_dir)
+    # -------------------
+
+    print("\n" + "=" * 60)
+    print("Training completed!")
     print("\n" + "=" * 60)
     print("Training completed!")
     print(f"Best validation accuracy: {best_val_acc:.2f}% (epoch {best_epoch})")
