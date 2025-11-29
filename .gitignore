@@ -2,4 +2,6 @@
 .env
 recordings/
 .DS_Store
+data/
+models/
 **/__pycache__/**

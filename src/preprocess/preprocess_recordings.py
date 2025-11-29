@@ -2,7 +2,7 @@
 
 import argparse # package permet de modifier les arguments depuis un terminal
 from pathlib import Path # pr mieux manipuler les chemins fichiers
-from preprocessing import AudioPreprocessor # importe la fonction Audioprocessor depuis le script preprocessing.py
+from .preprocessing import AudioPreprocessor # importe la fonction Audioprocessor depuis le script preprocessing.py
 from src.xenocanto.config import RECORDINGS_DIR # défini un chemin par défaut
 
 
