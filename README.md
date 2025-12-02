@@ -35,7 +35,7 @@ uv sync
 
 2. Preprocess recordings (converts audio to mel-spectrograms):
 ```bash
-python -m src.preprocess_recordings
+python -m src.preprocess.preprocess_recordings
 ```
 
 This will:
@@ -92,8 +92,11 @@ See `example_usage.py` for a complete example.
 Train the CNN model:
 
 ```bash
-python -m src.train
+(python -m src.train)
+python -m src.hyperparam_search 
 ```
+Lance hyperparam_search qui lance train
+
 
 Options:
 - `--data-dir`: Directory with train/val/test splits (default: `data/dataset`)
@@ -115,8 +118,9 @@ Evaluate the trained model on the test set:
 
 ```bash
 python -m src.evaluate
+python3 -m src.evaluate
 ```
-
+meilleur modèle du test_3: models/test_3/00001_32_80
 Options:
 - `--model-path`: Path to model checkpoint (default: `models/best_model.pth`)
 - `--test-dir`: Directory containing test data (default: `data/dataset/test`)
