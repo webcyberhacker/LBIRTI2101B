@@ -1,59 +1,68 @@
 from src.xenocanto import XenoCantoAPI, download_recordings
 from src.xenocanto.utils import get_bird_name
-import time  # Nécessaire pour faire une petite pause entre les oiseaux
+import time
 
 def main():
-    """Main function to search and download recordings for multiple species."""
-    # Initialize API client
     api = XenoCantoAPI()
-    
-    # Ta liste des 10 espèces cibles
+
     target_species = [
-        "Parus major",          # Mésange charbonnière
-        "Turdus merula",        # Merle noir
-        "Erithacus rubecula",   # Rouge-gorge familier
-        "Cyanistes caeruleus",  # Mésange bleue
-        "Passer domesticus",    # Moineau domestique
-        "Columba palumbus",     # Pigeon ramier
-        "Sturnus vulgaris",     # Étourneau sansonnet
-        "Fringilla coelebs",    # Pinson des arbres
-        "Streptopelia decaocto",# Tourterelle turque
-        "Pica pica"             # Pie bavarde
+        "Parus major",
+        "Turdus merula",
+        "Erithacus rubecula",
+        "Cyanistes caeruleus",
+        "Passer domesticus",
+        "Columba palumbus",
+        "Sturnus vulgaris",
+        "Fringilla coelebs",
+        "Streptopelia decaocto",
+        "Garrulus glandarius"
     ]
 
-    print(f"=== Démarrage du téléchargement pour {len(target_species)} espèces ===")
-    
+    max_per_species = 300
+    qualities = ["A", "B", "C", "D", "E"]
+
+    print(f"=== Début du téléchargement pour {len(target_species)} espèces ===")
+
     for species in target_species:
-        # On construit la requête dynamiquement pour chaque espèce
-        # Je garde 'cnt:belgium' pour rester fidèle à ton script, mais tu peux l'enlever pour avoir le monde entier
-        query = f'sp:"{species}" q:A type:song'
-        print(f"\n--- Traitement de : {species} ---")
-        print(f"Searching: {query}")
-        
-        # J'ai mis 20 fichiers par espèce (per_page=20) pour que tu aies un peu de matière pour l'IA
-        # Tu peux remettre 5 si c'est juste pour tester
-        data = api.search(query, per_page=50)
-        
-        if not data or not data.get('recordings'):
-            print(f"No recordings found for {species}.")
+        print(f"\n--- Espèce : {species} ---")
+
+        all_recordings = []
+
+        # On effectue 2 recherches : qualité A puis qualité B…
+        for q in qualities:
+            query = f'sp:"{species}" q:{q} type:song'
+            print(f"Requête: {query}")
+
+            data = api.search(query, per_page=max_per_species)
+            recs = data.get("recordings", [])
+
+            print(f"{len(recs)} sons trouvés en qualité {q}")
+
+            all_recordings.extend(recs)
+
+            # Si on a atteint ou dépassé 200, on arrête
+            if len(all_recordings) >= max_per_species:
+                break
+
+            time.sleep(0.5)
+
+        if not all_recordings:
+            print("Aucun enregistrement trouvé.")
             continue
-        
-        recordings = data.get('recordings', [])
-        total = data.get('numRecordings', 0)
-        
-        print(f"Found {total} recording(s). Downloading {len(recordings)}...")
-        
-        # Get bird name and download
-        if recordings:
-            # On récupère le nom formaté du dossier via le premier fichier trouvé
-            bird_name = get_bird_name(recordings[0])
-            downloaded, failed = download_recordings(recordings, bird_name)
-            print(f"Downloaded: {downloaded}, Failed: {failed}")
-        
-        # Petite pause de 1 seconde pour être poli avec le serveur
+
+        # On tronque à 200 si on a dépassé
+        selected = all_recordings[:max_per_species]
+        print(f"Total retenus : {len(selected)}")
+
+        # Nom du dossier à partir du premier fichier
+        bird_name = get_bird_name(selected[0])
+
+        downloaded, failed = download_recordings(selected, bird_name)
+        print(f"Téléchargés : {downloaded}, Échecs : {failed}")
+
         time.sleep(1)
 
-    print("\n=== The download is complete ===")
+    print("\n=== Téléchargement terminé ===")
 
 if __name__ == "__main__":
     main()

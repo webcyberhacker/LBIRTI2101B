@@ -13,5 +13,5 @@ dependencies = [
     "scipy",
     "scikit-learn",
     "tqdm",
-   
+    "librosa>=0.11.0",
 ]

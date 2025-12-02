@@ -11,6 +11,9 @@ from sklearn.metrics import classification_report, confusion_matrix
 from src.model import create_model
 from src.dataset import BirdDataset
 
+import os
+import numpy as np
+
 
 def evaluate(model_path: Path, test_dir: Path, device: str = "auto", batch_size: int = 16):
     """
@@ -123,6 +126,16 @@ def evaluate(model_path: Path, test_dir: Path, device: str = "auto", batch_size:
             print(f"\t{cm[i][j]:<10}", end="")
         print()
 
+    
+    # Save results to /results/
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
+    # Save confusion matrix
+    cm_path = results_dir / "confusion_matrix.csv"
+    np.savetxt(cm_path, cm, fmt='%d', delimiter=',')
+
+    print(f"Confusion matrix saved to: {cm_path}")
 
 def main():
     """Main evaluation function."""
@@ -130,7 +143,7 @@ def main():
     parser.add_argument(
         "--model-path",
         type=str,
-        default="models/best_model.pth",
+        default="models/test_3/00001_32_80/best_model.pth",
         help="Path to saved model checkpoint",
     )
     parser.add_argument(
