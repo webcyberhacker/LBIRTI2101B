@@ -7,19 +7,33 @@ st.set_page_config(page_title="Bird Identifier", page_icon="🐦", layout="cente
 CHEMIN_MODELE = "src/best_model.pth"
 
 # Picture
-BIRD_IMAGES = {
-    "Merle noir": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Turdus_Merula_in_Saint_Sernin_Croped.jpg",
-    "Mésange charbonnière": "https://lejardindesoiseaux.fr/wp-content/uploads/2022/12/51803190217_cb9089c7ff_k.jpg",
-    "Mésange bleue": "https://focusingonwildlife.com/news/wp-content/uploads/Blue-Tit-Parus-caeruleus-15.jpg",
-    "Rouge-gorge familier": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Erithacus_rubecula_with_cocked_head.jpg",
-    "Moineau domestique": "https://image.jimcdn.com/app/cms/image/transf/dimension=1480x10000:format=jpg/path/s5dde8bff85c81b2f/image/idee729741ace7b0a/version/1559635729/fiche-oiseaux-animaux-moineau-domestique-house-sparrow-animal-facts-bird.jpg",
-    "Pigeon ramier": "https://www.wnve.nl/images/C_palumbus.png",
-    "Étourneau sansonnet": "https://www.oiseaux.net/photos/gerard.fauvet/images/etourneau.sansonnet.gefa.2g.jpg",
-    "Pinson des arbres": "https://vigienature.openkeys.science/oiseaux/res/Pinson_des_arbres_2.jpg",
-    "Tourterelle turque": "https://www.parc-auxois.fr/wp-content/uploads/2019/06/tourterelle-turque-1.jpg",
-    "Geai des chênes": "https://www.animaleco.com/wp-content/uploads/2023/05/167370786_m_normal_none.jpg"
+
+LATIN_TO_FRENCH = {
+    "Turdus_merula": "Merle noir",
+    "Parus_major": "Mésange charbonnière",
+    "Cyanistes_caeruleus": "Mésange bleue",
+    "Erithacus_rubecula": "Rouge-gorge familier",
+    "Passer_domesticus": "Moineau domestique",
+    "Columba_palumbus": "Pigeon ramier",
+    "Sturnus_vulgaris": "Étourneau sansonnet",
+    "Fringilla_coelebs": "Pinson des arbres",
+    "Streptopelia_decaocto": "Tourterelle turque",
+    "Garrulus_glandarius": "Geai des chênes"
 }
-IMAGE_DEFAUT = "https://tse1.mm.bing.net/th/id/OIP.uNWfLzqs-dweZw2S9oDBzAHaID?pid=Api"
+
+BIRD_IMAGES = {
+    "Merle noir": "src/assets/merle_noir.jpg",
+    "Mésange charbonnière": "src/assets/mesange_charbo.jpg",
+    "Mésange bleue": "src/assets/mesange_bleue.jpg",
+    "Rouge-gorge familier": "src/assets/rouge_gorge_familier.jpg",
+    "Moineau domestique": "src/assets/moineau_domestique.jpg",
+    "Pigeon ramier": "src/assets/pigeon_ramier.png",
+    "Étourneau sansonnet": "src/assets/etourneau_sansonnet.jpg",
+    "Pinson des arbres": "src/assets/Pinson_des_arbres.jpg",
+    "Tourterelle turque": "src/assets/tourterelle_turque.jpg",
+    "Geai des chênes": "src/assets/geai_des_chenes.jpg"
+}
+IMAGE_DEFAUT = "src/assets/silhouete.jpg"
 
 
 # load the model
@@ -47,7 +61,7 @@ left_col, right_col = st.columns([1, 1])
 
 with left_col:
     st.markdown("""
-    **Espèces supportées (1-5) :** 1. Merle noir (*Turdus merula*)  
+    1. Merle noir (*Turdus merula*)  
     2. Mésange charbonnière (*Parus major*)  
     3. Mésange bleue (*Cyanistes caeruleus*)  
     4. Rouge-gorge familier (*Erithacus rubecula*)  
@@ -56,55 +70,94 @@ with left_col:
 
 with right_col:
     st.markdown("""
-    **Espèces supportées (6-10) :**
     6. Pigeon ramier (*Columba palumbus*)  
     7. Étourneau sansonnet (*Sturnus vulgaris*)  
     8. Pinson des arbres (*Fringilla coelebs*)  
-    9. Tourterelle turque (*Streptopelia decaocto*)
+    9. Tourterelle turque (*Streptopelia decaocto*)  
     10. Geai des chênes (*Garrulus glandarius*)
     """)
-
-st.markdown("---")  # Séparateur visuel
-
+# Analyse
+st.markdown("---")
 fichier = st.file_uploader("Audio file (.wav or mp3)", type=["wav", "mp3"])
 
-if fichier and st.button("Analyse"):
+button = False
+if fichier:
+    button = st.button("Analyse")
+
+st.markdown("### Result")
+col_res_texte, col_res_image = st.columns([1, 1])
+with col_res_texte:
+    placeholder_texte = st.empty()
+with col_res_image:
+    placeholder_image = st.empty()
+
+if fichier and button:
     try:
         # Sauvegarde temporaire
         with open("temp.wav", "wb") as f:
-            f.write(fichier.getbuffer())  # <--- CORRIGÉ ICI (Décalé vers la droite)
+            f.write(fichier.getbuffer())
 
         # Prédiction
         resultat = ia.predict("temp.wav")
-        specie_name = resultat['label']
+        latin = resultat['label']
+        confidence = resultat['confidence']
+        specie_name = LATIN_TO_FRENCH.get(latin, latin)
 
         # Result affichage
-        st.markdown("### Result")
-
-        col_res_texte, col_res_image = st.columns([1, 1])
-
+        placeholder_texte.empty()
         with col_res_texte:
-            st.success(f"Prediction : **{specie_name}**")
-            st.info(f"Confidence : {resultat['confidence'] * 100:.2f}%")
 
-        with col_res_image:
-            url_img = BIRD_IMAGES.get(specie_name, IMAGE_DEFAUT)
-            st.image(url_img, caption=f"Illustration : {specie_name}", use_column_width=True)
+            if confidence < 0.70:
+                st.error("⚠️ Unknown species")
+                st.write("This song cannot be identified with a sufficient degree of confidence.")
+                st.caption(f"Best match : {specie_name} ({confidence * 100:.1f}%), but that's not enough.")
 
-    except Exception as e:  # <--- CORRIGÉ ICI (Aligné avec le try)
+                url_img = IMAGE_DEFAUT
+                caption_img = "Unknown"
+
+            elif 0.70 <= confidence < 0.90:
+                st.warning(f"Uncertain identification : **{specie_name}**")
+                st.write(
+                    f"Similarities have been detected ({confidence * 100:.1f}%), but it could be another species.")
+                st.caption(f"Scientific name: *{latin}*")
+
+                url_img = BIRD_IMAGES.get(specie_name, IMAGE_DEFAUT)
+                caption_img = f"Likely illustration : {specie_name}"
+
+            else:
+                st.success(f"Prediction : **{specie_name}**")
+                st.info(f"Confidence : {confidence * 100:.2f}%")
+                st.caption(f"Scientific name: *{latin}*")
+
+                url_img = BIRD_IMAGES.get(specie_name, IMAGE_DEFAUT)
+                caption_img = f"Illustration : {specie_name}"
+
+            placeholder_image.image(url_img, caption=caption_img, width="stretch")
+
+    except Exception as e:
         st.error(f"An error occurred during the analysis: {e}")
 
-    finally:  # <--- CORRIGÉ ICI (Aligné avec le try)
+    finally:
         if os.path.exists("temp.wav"):
             os.remove("temp.wav")
 
 # Footer
 st.markdown("---")
-st.markdown("""
-    <div style='text-align: center; color: grey;'>
-       Project completed by Morgane Clicque, Bastien d'Argembeau, Gabriel Deligne
-       Matthias Dewé, Valérian Vermeeren and Alix Wagner as part of the course LBIRTI2101B.  
-        The model was trained using the xenocanto database.
+# Création de deux colonnes : Texte (7 parts) | Logo (1 part)
+col_footer_text, col_footer_logo = st.columns([7, 1])
+
+with col_footer_text:
+    st.markdown("""
+    <div style='text-align: right; color: grey; font-size: 12px;'>
+       Project completed by Morgane Clicque, Bastien d'Argembeau, Gabriel Deligne,<br>
+       Matthias Dewé, Valérian Vermeeren and Alix Wagner.<br>
+       <i>Course LBIRTI2101B - 2025-2026>
     </div>
     """, unsafe_allow_html=True)
+
+with col_footer_logo:
+    # Logo UCLouvain
+    st.image("src/assets/agro.jpeg",
+             width="stretch")
+
 
